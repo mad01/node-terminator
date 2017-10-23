@@ -58,7 +58,7 @@ func newAgentNodeController(
 				if key, err := cache.MetaNamespaceKeyFunc(new); err == nil {
 					log.Debugf("updateFunc key: %v", key)
 					newNode := new.(*v1.Node)
-					oldNode := new.(*v1.Node)
+					oldNode := old.(*v1.Node)
 					if newNode.ResourceVersion != oldNode.ResourceVersion {
 						reboot, err := rebootOK(newNode)
 						if err != nil {
