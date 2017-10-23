@@ -17,8 +17,8 @@ import (
 )
 
 const (
-	annotationRebootOK             = "node.updater/ok"
-	annotationExpectKubeletVersion = "node.updater/kubeletVersion"
+	annotationRebootOK             = "node.updater/ok"             // should be true/false as string
+	annotationExpectKubeletVersion = "node.updater/kubeletVersion" // string format v<major>.<minor>.<patch>
 )
 
 type agentNodeController struct {
