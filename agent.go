@@ -57,17 +57,20 @@ func newAgentNodeController(
 			UpdateFunc: func(old, new interface{}) {
 				if key, err := cache.MetaNamespaceKeyFunc(new); err == nil {
 					log.Debugf("updateFunc key: %v", key)
-					node := new.(*v1.Node)
-					reboot, err := rebootOK(node)
-					if err != nil {
-						log.Errorf("%v", err.Error())
-					}
-					if reboot {
-						rebooting := rebootNode()
-						log.Infof("rebooting node: %v", rebooting)
-					}
+					newNode := new.(*v1.Node)
+					oldNode := new.(*v1.Node)
+					if newNode.ResourceVersion != oldNode.ResourceVersion {
+						reboot, err := rebootOK(newNode)
+						if err != nil {
+							log.Errorf("%v", err.Error())
+						}
+						if reboot {
+							rebooting := rebootNode()
+							log.Infof("rebooting node: %v", rebooting)
+						}
 
-					fmt.Printf("node %v time: %v\n", node.Name, time.Now().Unix())
+						fmt.Printf("node %v time: %v\n", newNode.Name, time.Now().Unix())
+					}
 				}
 			},
 			DeleteFunc: func(obj interface{}) {},
