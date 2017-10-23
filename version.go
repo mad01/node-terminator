@@ -8,6 +8,6 @@ var (
 	Version = "not set"
 )
 
-func getVersion() {
-	fmt.Printf("Version: %v\n", Version)
+func getVersion() string {
+	return fmt.Sprintf("Version: %v", Version)
 }
