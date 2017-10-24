@@ -80,6 +80,7 @@ Commands:
 }
 
 func main() {
+	LogInit(false)
 	config := flags()
 
 	client, err := k8sGetClient(config.kubeconfig)
