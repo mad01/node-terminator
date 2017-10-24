@@ -14,19 +14,19 @@ import (
 )
 
 // manages all nodes and sets annotations on N nodes to reboot at one time
-type nodeController struct {
+type nodeCoordinatorController struct {
 	client     kubernetes.Interface
 	informer   cache.Controller
 	indexer    cache.Indexer
 	nodeLister lister_v1.NodeLister
 }
 
-func newNodeController(
+func newNodeCoordinatorController(
 	client kubernetes.Interface,
 	namespace string,
-	updateInterval time.Duration) *nodeController {
+	updateInterval time.Duration) *nodeCoordinatorController {
 
-	c := &nodeController{
+	c := &nodeCoordinatorController{
 		client: client,
 	}
 
@@ -58,11 +58,11 @@ func newNodeController(
 	return c
 }
 
-func (c *nodeController) Run(stopCh chan struct{}) {
-	log.Info("Starting nodeController")
+func (c *nodeCoordinatorController) Run(stopCh chan struct{}) {
+	log.Info("Starting nodeCoordinatorController")
 
 	go c.informer.Run(stopCh)
 
 	<-stopCh
-	log.Info("Stopping nodeController")
+	log.Info("Stopping nodeCoordinatorController")
 }
