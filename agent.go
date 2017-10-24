@@ -125,6 +125,7 @@ func rebootOK(node *v1.Node) (bool, error) {
 	}
 	if annotations[annotationRebootOK] == "true" {
 		log.Info("ok to reboot node")
+		return true, nil
 	}
-	return true, nil
+	return false, nil
 }
