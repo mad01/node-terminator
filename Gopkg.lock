@@ -14,12 +14,6 @@
   revision = "de5bf2ad457846296e2031421a34e2568e304e35"
 
 [[projects]]
-  name = "github.com/coreos/go-systemd"
-  packages = ["login1"]
-  revision = "d2196463941895ee908e13531a23a39feb9e1243"
-  version = "v15"
-
-[[projects]]
   name = "github.com/davecgh/go-spew"
   packages = ["spew"]
   revision = "346938d642f2ec3594ed81d874461961cd0faa76"
@@ -60,12 +54,6 @@
   name = "github.com/go-openapi/swag"
   packages = ["."]
   revision = "f3f9494671f93fcff853e3c6e9e948b3eb71e590"
-
-[[projects]]
-  name = "github.com/godbus/dbus"
-  packages = ["."]
-  revision = "5f6efc7ef2759c81b7ba876593971bfce311eab3"
-  version = "v4.0.0"
 
 [[projects]]
   name = "github.com/gogo/protobuf"
@@ -128,6 +116,12 @@
   version = "0.2.4"
 
 [[projects]]
+  name = "github.com/inconshreveable/mousetrap"
+  packages = ["."]
+  revision = "76626ae9c91c4f2a10f34cad8ce83ea42c93bb75"
+  version = "v1.0"
+
+[[projects]]
   name = "github.com/json-iterator/go"
   packages = ["."]
   revision = "6240e1e7983a85228f7fd9c3e1b6932d46ec58e2"
@@ -162,6 +156,12 @@
   packages = ["."]
   revision = "f006c2ac4710855cf0f916dd6b77acf6b048dc6e"
   version = "v1.0.3"
+
+[[projects]]
+  branch = "master"
+  name = "github.com/spf13/cobra"
+  packages = ["."]
+  revision = "7b2c5ac9fc04fc5efafb60700713d4fa609b777b"
 
 [[projects]]
   name = "github.com/spf13/pflag"
@@ -232,6 +232,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "d0c45489e047cbf30f9354e1f85e744531aeb71b8d37d8cc20052129611cbd4c"
+  inputs-digest = "187c92cade3f9372b90ad9363fa1715224e0361c55f2d557d6b2ddb22209ab17"
   solver-name = "gps-cdcl"
   solver-version = 1
