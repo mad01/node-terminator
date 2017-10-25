@@ -26,6 +26,10 @@ type Terminator struct {
 
 // Run terminator
 func (t *Terminator) Run(stopCh chan struct{}) {
+	// TODO: implement node no schedule
+	// TODO: implement drain node handling / eveicting of all pods on that node
+	// TODO: implement actuall node termination (only for worker nodes) master should be skipped
+	// TODO: implement wait for graceperiod before doing force terminate of nodes
 	for {
 		select {
 		case _ = <-stopCh:
