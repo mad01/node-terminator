@@ -32,6 +32,8 @@ func (t *Terminator) Run(stopCh chan struct{}) {
 	// TODO: implement wait for graceperiod before doing force terminate of nodes
 	for {
 		select {
+		case event := <-t.events:
+			log.Infof("terminator get event %v", event.nodename)
 		case _ = <-stopCh:
 			log.Info("stopping updater runner")
 			return

@@ -8,6 +8,36 @@ import (
 	"github.com/spf13/cobra"
 )
 
+func cmdPatchNode() *cobra.Command {
+	var kubeconfig, nodename string
+	var unschedulable bool
+
+	var command = &cobra.Command{
+		Use:   "patch",
+		Short: "patch node",
+		Long:  "",
+		Run: func(cmd *cobra.Command, args []string) {
+			client, err := k8sGetClient(kubeconfig)
+			if err != nil {
+				log.Error(fmt.Errorf("failed to get client: %v", err))
+			}
+			if unschedulable {
+				err := setNodeUnschedulable(nodename, client)
+				if err != nil {
+					fmt.Println(err.Error())
+				}
+			}
+		},
+	}
+	command.Flags().StringVar(&kubeconfig, "kube.config", "", "path to kube config")
+	command.Flags().BoolVar(&unschedulable, "unschedulable", false, "set node to unschedulable")
+	command.Flags().StringVar(&nodename, "node.name", "", "name of node")
+	command.MarkFlagRequired("kube.config")
+	command.MarkFlagRequired("node.name")
+
+	return command
+}
+
 func cmdCordinator() *cobra.Command {
 	var updateInterval time.Duration
 	var kubeconfig, nodename string
@@ -48,6 +78,7 @@ func runCmd() error {
 	var rootCmd = &cobra.Command{Use: "k8s-node-updater"}
 	rootCmd.AddCommand(cmdCordinator())
 	rootCmd.AddCommand(cmdVersion())
+	rootCmd.AddCommand(cmdPatchNode())
 
 	err := rootCmd.Execute()
 	if err != nil {
