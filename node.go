@@ -47,9 +47,6 @@ func nodeSchedulablePatch(node *v1.Node, schedulable bool, client *kubernetes.Cl
 		return fmt.Errorf("failed to create patch %v", err.Error())
 	}
 
-	if err != nil {
-		return fmt.Errorf("failed to get node patch %v", err.Error())
-	}
 	_, err = client.Core().Nodes().Patch(node.GetName(), types.StrategicMergePatchType, patchBytes)
 	if err != nil {
 		return fmt.Errorf("failed to set node unschedulable=%v %v", schedulable, err.Error())
