@@ -26,6 +26,11 @@ func cmdPatchNode() *cobra.Command {
 				if err != nil {
 					fmt.Println(err.Error())
 				}
+			} else {
+				err := setNodeSchedulable(nodename, client)
+				if err != nil {
+					fmt.Println(err.Error())
+				}
 			}
 		},
 	}
