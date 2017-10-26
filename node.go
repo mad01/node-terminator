@@ -17,17 +17,7 @@ func setNodeUnschedulable(nodename string, client *kubernetes.Clientset) error {
 	if err != nil {
 		return fmt.Errorf("failed to get node %v %v", nodename, err.Error())
 	}
-
-	patchBytes, err := nodeSchedulablePatch(node, true)
-	if err != nil {
-		return fmt.Errorf("failed to get node patch %v", err.Error())
-	}
-
-	_, err = client.Core().Nodes().Patch(nodename, types.StrategicMergePatchType, patchBytes)
-	if err != nil {
-		return fmt.Errorf("failed to set node as unschedulable: %v", err.Error())
-	}
-	return nil
+	return nodeSchedulablePatch(node, true, client)
 }
 
 func setNodeSchedulable(nodename string, client *kubernetes.Clientset) error {
@@ -36,35 +26,34 @@ func setNodeSchedulable(nodename string, client *kubernetes.Clientset) error {
 		return fmt.Errorf("failed to get node %v %v", nodename, err.Error())
 	}
 
-	patchBytes, err := nodeSchedulablePatch(node, false)
-	if err != nil {
-		return fmt.Errorf("failed to get node patch %v", err.Error())
-	}
-	_, err = client.Core().Nodes().Patch(nodename, types.StrategicMergePatchType, patchBytes)
-	if err != nil {
-		return fmt.Errorf("failed to set node as unschedulable: %v", err.Error())
-	}
-	return nil
+	return nodeSchedulablePatch(node, false, client)
 }
 
-func nodeSchedulablePatch(node *v1.Node, schedulable bool) ([]byte, error) {
+func nodeSchedulablePatch(node *v1.Node, schedulable bool, client *kubernetes.Clientset) error {
 	// patchBytes, err := strategicpatch.CreateTwoWayMergePatch(oldData, newData, v1.Node{})
-	var emptyBytes []byte
 
 	oldData, err := json.Marshal(node)
 	if err != nil {
-		return emptyBytes, fmt.Errorf("failed to Marshal old node %v", err.Error())
+		return fmt.Errorf("failed to Marshal old node %v", err.Error())
 	}
 	node.Spec.Unschedulable = schedulable
 	newData, err := json.Marshal(node)
 	if err != nil {
-		return emptyBytes, fmt.Errorf("failed to Marshal new node %v", err.Error())
+		return fmt.Errorf("failed to Marshal new node %v", err.Error())
 	}
 
 	patchBytes, err := strategicpatch.CreateTwoWayMergePatch(oldData, newData, v1.Node{})
 	if err != nil {
-		return emptyBytes, fmt.Errorf("failed to create patch %v", err.Error())
+		return fmt.Errorf("failed to create patch %v", err.Error())
 	}
 
-	return patchBytes, nil
+	if err != nil {
+		return fmt.Errorf("failed to get node patch %v", err.Error())
+	}
+	_, err = client.Core().Nodes().Patch(node.GetName(), types.StrategicMergePatchType, patchBytes)
+	if err != nil {
+		return fmt.Errorf("failed to set node unschedulable=%v %v", schedulable, err.Error())
+	}
+
+	return nil
 }
