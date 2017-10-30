@@ -1,6 +1,9 @@
 package main
 
-import log "github.com/sirupsen/logrus"
+import (
+	log "github.com/sirupsen/logrus"
+	"k8s.io/client-go/kubernetes"
+)
 
 func newTerminatorEvent() *TerminatorEvent {
 	t := TerminatorEvent{}
@@ -12,9 +15,10 @@ type TerminatorEvent struct {
 	nodename string
 }
 
-func newTerminator() *Terminator {
+func newTerminator(client *kubernetes.Clientset) *Terminator {
 	t := Terminator{
 		events: make(chan TerminatorEvent),
+		client: client,
 	}
 	return &t
 }
