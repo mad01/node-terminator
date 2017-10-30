@@ -41,6 +41,7 @@ func (e *EC2) awsGetInstanceID(privateDnsName string) (string, error) {
 		log.Debugf("found instances in resp %v", len(resarvation.Instances))
 		for _, instance := range resp.Reservations[index].Instances {
 			if *instance.PrivateDnsName == privateDnsName {
+				log.Debugf("found instance %v with id: %v", privateDnsName, *instance.InstanceId)
 				return *instance.InstanceId, nil
 			}
 		}
@@ -50,6 +51,7 @@ func (e *EC2) awsGetInstanceID(privateDnsName string) (string, error) {
 
 // awsTerminateInstance terminate instance with private dns name
 func (e *EC2) awsTerminateInstance(privateDnsName string) error {
+	log.Infof("starting to terminate %v", privateDnsName)
 	instanceID, err := e.awsGetInstanceID(privateDnsName)
 	if err != nil {
 		return err
@@ -62,6 +64,7 @@ func (e *EC2) awsTerminateInstance(privateDnsName string) error {
 	if err != nil {
 		return fmt.Errorf("failed to terminate instance %v %v %v", privateDnsName, instanceID, err.Error())
 	}
+	log.Debugf("terminated instance %v", privateDnsName)
 	return nil
 
 }
