@@ -22,12 +22,13 @@ type EC2 struct {
 	client *ec2.EC2
 }
 
-func (e *EC2) awsGetInstanceID(nodename string) (string, error) {
+// awsGetInstanceID by aws private dns name
+func (e *EC2) awsGetInstanceID(privateDnsName string) (string, error) {
 	describeInput := &ec2.DescribeInstancesInput{
 		Filters: []*ec2.Filter{
 			{
 				Name:   aws.String("network-interface.private-dns-name"),
-				Values: []*string{aws.String(nodename)},
+				Values: []*string{aws.String(privateDnsName)},
 			},
 		},
 	}
@@ -39,16 +40,17 @@ func (e *EC2) awsGetInstanceID(nodename string) (string, error) {
 	for index, resarvation := range resp.Reservations {
 		log.Debugf("found instances in resp %v", len(resarvation.Instances))
 		for _, instance := range resp.Reservations[index].Instances {
-			if *instance.PrivateDnsName == nodename {
+			if *instance.PrivateDnsName == privateDnsName {
 				return *instance.InstanceId, nil
 			}
 		}
 	}
-	return "", fmt.Errorf("failed to find instance with name %v", nodename)
+	return "", fmt.Errorf("failed to find instance with private dns name %v", privateDnsName)
 }
 
-func (e *EC2) awsTerminateInstance(nodename string) error {
-	instanceID, err := e.awsGetInstanceID(nodename)
+// awsTerminateInstance terminate instance with private dns name
+func (e *EC2) awsTerminateInstance(privateDnsName string) error {
+	instanceID, err := e.awsGetInstanceID(privateDnsName)
 	if err != nil {
 		return err
 	}
@@ -58,7 +60,7 @@ func (e *EC2) awsTerminateInstance(nodename string) error {
 	}
 	_, err = e.client.TerminateInstances(terminationInput)
 	if err != nil {
-		return fmt.Errorf("failed to terminate instance %v %v %v", nodename, instanceID, err.Error())
+		return fmt.Errorf("failed to terminate instance %v %v %v", privateDnsName, instanceID, err.Error())
 	}
 	return nil
 
