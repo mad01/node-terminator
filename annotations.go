@@ -10,10 +10,14 @@ const (
 	nodeAnnotation = "node.updater.reboot" // true as string
 )
 
+var (
+	errMissingNodeAnnotation = fmt.Errorf("missing annotation %v", nodeAnnotation)
+)
+
 func checkAnnotationsExists(node *v1.Node) error {
 	annotations := node.GetAnnotations()
 	if _, ok := annotations[nodeAnnotation]; ok {
 		return nil
 	}
-	return fmt.Errorf("missing annotation %v", nodeAnnotation)
+	return errMissingNodeAnnotation
 }
