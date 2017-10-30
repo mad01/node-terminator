@@ -65,7 +65,7 @@ func (c *nodeCoordinatorController) Run(stopCh chan struct{}) {
 	log.Info("Starting nodeCoordinatorController")
 
 	go c.informer.Run(stopCh)
-	go c.terminator.Run(stopCh)
+	go c.terminator.Run(stopCh) //TODO: implement to run N terminators to allow more paralell terminations of nodes
 
 	<-stopCh
 	log.Info("Stopping nodeCoordinatorController")
