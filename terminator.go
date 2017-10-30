@@ -48,11 +48,10 @@ func (t *Terminator) Run(stopCh chan struct{}) {
 }
 
 func (t *Terminator) terminate(e *TerminatorEvent) error {
-	// TODO: implement node no schedule
 	// TODO: implement drain node handling / eveicting of all pods on that node
-	// TODO: implement actuall node termination (only for worker nodes) master should be skipped
 	// TODO: implement wait for graceperiod before doing force terminate of nodes
 
+	// set node ot no schedule
 	log.Infof("terminator get event %v", e.nodename)
 	err := setNodeUnschedulable(e.nodename, t.client)
 	if err != nil {
@@ -61,6 +60,7 @@ func (t *Terminator) terminate(e *TerminatorEvent) error {
 	// drain node
 
 	// terninate node
+	// TODO: implement actuall node termination (only for worker nodes) master should be skipped
 	ec2Client := newEC2()
 	err = ec2Client.awsTerminateInstance(e.nodename)
 	if err != nil {
