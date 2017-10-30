@@ -26,21 +26,39 @@ func newTerminator(client *kubernetes.Clientset) *Terminator {
 // Terminator handles node terminate events and handles the lifetime of the event
 type Terminator struct {
 	events chan TerminatorEvent
+	client *kubernetes.Clientset
 }
 
 // Run terminator
 func (t *Terminator) Run(stopCh chan struct{}) {
-	// TODO: implement node no schedule
-	// TODO: implement drain node handling / eveicting of all pods on that node
-	// TODO: implement actuall node termination (only for worker nodes) master should be skipped
-	// TODO: implement wait for graceperiod before doing force terminate of nodes
 	for {
 		select {
 		case event := <-t.events:
-			log.Infof("terminator get event %v", event.nodename)
+			err := t.terminate(&event)
+			if err != nil {
+				log.Errorf("failed to terminate node %v %v", event.nodename, err.Error())
+			}
 		case _ = <-stopCh:
 			log.Info("stopping updater runner")
 			return
 		}
 	}
+}
+
+func (t *Terminator) terminate(e *TerminatorEvent) error {
+	// TODO: implement node no schedule
+	// TODO: implement drain node handling / eveicting of all pods on that node
+	// TODO: implement actuall node termination (only for worker nodes) master should be skipped
+	// TODO: implement wait for graceperiod before doing force terminate of nodes
+
+	log.Infof("terminator get event %v", e.nodename)
+	err := setNodeUnschedulable(e.nodename, t.client)
+	if err != nil {
+		log.Errorf("failed to patch node %v", err.Error())
+	}
+	// drain node
+	// terninate node
+	// wait for new node (sleep)
+	// release and go to next
+	return nil
 }
