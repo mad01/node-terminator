@@ -8,6 +8,27 @@ import (
 	"github.com/spf13/cobra"
 )
 
+func cmdTerminateNode() *cobra.Command {
+	var nodename string
+
+	var command = &cobra.Command{
+		Use:   "terminate",
+		Short: "terminate node with private dns name",
+		Long:  "",
+		Run: func(cmd *cobra.Command, args []string) {
+			client := newEC2()
+			err := client.awsTerminateInstance(nodename)
+			if err != nil {
+				log.Errorf("failed to terminate instance %v %v", nodename, err.Error())
+			}
+		},
+	}
+	command.Flags().StringVar(&nodename, "node.name", "", "name of node")
+	command.MarkFlagRequired("node.name")
+
+	return command
+}
+
 func cmdPatchNode() *cobra.Command {
 	var kubeconfig, nodename string
 	var unschedulable bool
@@ -84,6 +105,7 @@ func runCmd() error {
 	rootCmd.AddCommand(cmdCordinator())
 	rootCmd.AddCommand(cmdVersion())
 	rootCmd.AddCommand(cmdPatchNode())
+	rootCmd.AddCommand(cmdTerminateNode())
 
 	err := rootCmd.Execute()
 	if err != nil {
