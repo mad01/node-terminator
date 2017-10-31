@@ -7,7 +7,7 @@ import (
 )
 
 const (
-	nodeAnnotation = "node.updater.reboot" // true as string
+	nodeAnnotation = "k8s.node.terminator.reboot" // true as string
 )
 
 var (
