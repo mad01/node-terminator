@@ -25,13 +25,14 @@ type nodeCoordinatorController struct {
 func newNodeCoordinatorController(
 	client kubernetes.Clientset,
 	namespace string,
-	updateInterval time.Duration) *nodeCoordinatorController {
+	updateInterval time.Duration,
+	kubeconfig string) *nodeCoordinatorController {
 
 	c := &nodeCoordinatorController{
 		client: client,
 	}
 
-	c.terminator = newTerminator(&client)
+	c.terminator = newTerminator(&client, kubeconfig)
 
 	indexer, informer := cache.NewIndexerInformer(
 		&cache.ListWatch{
