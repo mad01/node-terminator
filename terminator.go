@@ -71,7 +71,7 @@ func (t *Terminator) terminate(event *TerminatorEvent) error {
 	}
 
 	// terninate node
-	// TODO: implement actuall node termination (only for worker nodes) master should be skipped
+	// TODO: implement safeguard to never terminate master node only worker
 	ec2Client := newEC2()
 	err = ec2Client.awsTerminateInstance(event.nodename)
 	if err != nil {
