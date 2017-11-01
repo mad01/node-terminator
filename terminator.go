@@ -55,7 +55,6 @@ func (t *Terminator) Run(stopCh chan struct{}) {
 }
 
 func (t *Terminator) terminate(event *TerminatorEvent) error {
-	// TODO: implement drain node handling / eveicting of all pods on that node
 	// TODO: implement wait for graceperiod before doing force terminate of nodes
 
 	// set node ot no schedule
