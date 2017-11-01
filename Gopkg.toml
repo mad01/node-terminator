@@ -21,17 +21,23 @@
 #  version = "2.4.0"
 
 [[constraint]]
-  name = "github.com/coreos/go-systemd"
-  version = "15.0.0"
-
-[[constraint]]
   branch = "master"
   name = "k8s.io/api"
 
 [[constraint]]
-  branch = "master"
+  # branch = "master"
   name = "k8s.io/apimachinery"
+  revision = "019ae5ada31de202164b118aee88ee2d14075c31"
 
 [[constraint]]
   branch = "master"
   name = "k8s.io/client-go"
+
+[[constraint]]
+  # branch = "master"
+  name = "k8s.io/kubernetes"
+  revision = "bdaeafa71f6c7c04636251031f93464384d54963"
+
+[[constraint]]
+  name = "github.com/russross/blackfriday"
+  revision = "4048872b16cc0fc2c5fd9eacf0ed2c2fedaa0c8c"
