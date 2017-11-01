@@ -8,6 +8,34 @@ import (
 	"github.com/spf13/cobra"
 )
 
+func cmdDrainNode() *cobra.Command {
+	var kubeconfig, nodename string
+	var waitInterval time.Duration
+
+	var command = &cobra.Command{
+		Use:   "drain",
+		Short: "drain node",
+		Long:  "",
+		Run: func(cmd *cobra.Command, args []string) {
+			e := newEviction(kubeconfig)
+			e.waitInterval = waitInterval
+
+			err := e.DrainNode(nodename)
+			if err != nil {
+				log.Errorf("failed to drain node %v %v", nodename, err.Error())
+			}
+		},
+	}
+
+	command.Flags().DurationVar(&waitInterval, "wait.interval", 1*time.Minute, "time.Duration drain wait interval")
+	command.Flags().StringVar(&kubeconfig, "kube.config", "", "path to kube config")
+	command.Flags().StringVar(&nodename, "node.name", "", "name of node")
+	command.MarkFlagRequired("kube.config")
+	command.MarkFlagRequired("node.name")
+
+	return command
+}
+
 func cmdTerminateNode() *cobra.Command {
 	var nodename string
 
@@ -77,12 +105,14 @@ func cmdCordinator() *cobra.Command {
 				log.Error(fmt.Errorf("failed to get client: %v", err))
 			}
 			fmt.Println(client.ServerVersion())
+			// TODO: implement to actually start the cordinator
 		},
 	}
 
 	command.Flags().DurationVar(&updateInterval, "update.interval", 10*time.Second, "time.Duration cache update interval")
 	command.Flags().StringVar(&kubeconfig, "kube.config", "", "path to kube config")
 	command.Flags().StringVar(&nodename, "node.name", "", "name of node")
+	command.MarkFlagRequired("kube.config")
 	command.MarkFlagRequired("node.name")
 
 	return command
@@ -106,6 +136,7 @@ func runCmd() error {
 	rootCmd.AddCommand(cmdVersion())
 	rootCmd.AddCommand(cmdPatchNode())
 	rootCmd.AddCommand(cmdTerminateNode())
+	rootCmd.AddCommand(cmdDrainNode())
 
 	err := rootCmd.Execute()
 	if err != nil {
