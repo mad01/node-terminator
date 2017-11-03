@@ -2,8 +2,6 @@
 
 the assumption for this to work is that you are using something like `kops` that have a remote state that is newer then the current state of the nodes in the cluster. for example the k8s version is `1.7.4` and you like to update all nodes to `1.7.9`. and you have updated the remote state that kops nodeup uses this would allow a cluster update of the worker nodes by a service running in the cluster
 
-it's outside of the scope of this service to set the annotations on the nodes. The idea is that this will be managed by a external service or by using kubectl. a external service could set the annotations on nodes that does not match the desired state. You could for example only have nodes annotated during a time window i.e a maintenance window and only have nodes terminate slowly in that window
-
 A service to manage the upgrade lifecyckle of k8s nodes. The terminator looks for a annotation on the nodes. The terminator then based on the allowed concurrent terminations and wait inbetween terminations it will terminate N nodes at one time and track the progress of the nodes until all the nodes in a cluster have been terminated that have that annotation. 
 
 the terminator does the following
@@ -36,3 +34,8 @@ add annotation to node for termination
 ```
 kubectl annotate node ip-172-20-118-57.eu-west-1.compute.internal k8s.node.terminator.reboot="true"
 ```
+
+## outside scope of service 
+
+it's outside of the scope of this service to set the annotations on the nodes. The idea is that this will be managed by a external service or by using kubectl. a external service could set the annotations on nodes that does not match the desired state. You could for example only have nodes annotated during a time window i.e a maintenance window and only have nodes terminate slowly in that window
+
