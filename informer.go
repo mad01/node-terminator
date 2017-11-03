@@ -8,6 +8,7 @@ import (
 	"k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
+	"k8s.io/apimachinery/pkg/util/wait"
 	"k8s.io/apimachinery/pkg/watch"
 	"k8s.io/client-go/kubernetes"
 	lister_v1 "k8s.io/client-go/listers/core/v1"
@@ -77,7 +78,11 @@ func (c *nodeController) Run(stopCh chan struct{}) {
 	log.Info("Starting nodeController")
 
 	go c.informer.Run(stopCh)
-	go c.terminator.Run(stopCh)
+
+	// start up your worker threads based on concurrentTerminations
+	for i := 0; i < c.concurrentTerminations; i++ {
+		go wait.Until(c.terminator.Run, time.Second, stopCh)
+	}
 
 	<-stopCh
 	log.Info("Stopping nodeController")
