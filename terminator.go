@@ -22,7 +22,12 @@ type TerminatorEvent struct {
 	waitInterval time.Duration
 }
 
-func newTerminator(client *kubernetes.Clientset, kubeconfig string) *Terminator {
+func newTerminator(kubeconfig string) *Terminator {
+	client, err := k8sGetClient(kubeconfig)
+	if err != nil {
+		panic(fmt.Sprintf("failed to get client: %v", err.Error()))
+	}
+
 	t := Terminator{
 		events:   make(chan TerminatorEvent),
 		client:   client,
