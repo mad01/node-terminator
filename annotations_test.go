@@ -31,6 +31,22 @@ func TestCheckAnnotationsExists(t *testing.T) {
 		},
 
 		{
+			testName: "node with correct annotations but not set to true",
+			node: &v1.Node{
+				ObjectMeta: metav1.ObjectMeta{
+					Name: "node0",
+					Annotations: map[string]string{
+						nodeAnnotation: "false",
+					},
+				},
+				Spec: v1.NodeSpec{
+					ProviderID: "node0",
+				},
+			},
+			expected: errNodeAnnotationNotTrue,
+		},
+
+		{
 			testName: "node with correct annotations",
 			node: &v1.Node{
 				ObjectMeta: metav1.ObjectMeta{

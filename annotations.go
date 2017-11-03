@@ -12,12 +12,16 @@ const (
 
 var (
 	errMissingNodeAnnotation = fmt.Errorf("missing annotation %v", nodeAnnotation)
+	errNodeAnnotationNotTrue = fmt.Errorf("annotation %v not set true", nodeAnnotation)
 )
 
 func checkAnnotationsExists(node *v1.Node) error {
 	annotations := node.GetAnnotations()
 	if _, ok := annotations[nodeAnnotation]; ok {
-		return nil
+		if annotations[nodeAnnotation] == "true" {
+			return nil
+		}
+		return errNodeAnnotationNotTrue
 	}
 	return errMissingNodeAnnotation
 }
