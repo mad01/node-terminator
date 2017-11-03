@@ -29,7 +29,7 @@ func newEviction(kubeconfig string) *Eviction {
 	}
 
 	e := Eviction{
-		waitInterval: 5 * time.Minute,
+		waitInterval: 1 * time.Minute,
 		ClientConfig: kutil.NewClientConfig(config, metav1.NamespaceAll),
 	}
 	return &e
