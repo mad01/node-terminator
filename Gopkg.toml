@@ -41,3 +41,11 @@
 [[constraint]]
   name = "github.com/russross/blackfriday"
   revision = "4048872b16cc0fc2c5fd9eacf0ed2c2fedaa0c8c"
+
+[[constraint]]
+  name = "github.com/docker/docker"
+  revision = "4f3616fb1c112e206b88cb7a9922bf49067a7756"
+
+[[constraint]]
+  name = "github.com/docker/distribution"
+  revision = "edc3ab29cdff8694dd6feb85cfeb4b5f1b38ed9c"
