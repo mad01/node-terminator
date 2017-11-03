@@ -93,27 +93,35 @@ func cmdPatchNode() *cobra.Command {
 }
 
 func cmdRunTerminator() *cobra.Command {
-	var updateInterval time.Duration
-	var kubeconfig, nodename string
+	var updateInterval, waitInterval time.Duration
+	var kubeconfig string
+	var concurrentTerminations int
 	var command = &cobra.Command{
 		Use:   "terminator",
 		Short: "run terminator",
 		Long:  "",
 		Run: func(cmd *cobra.Command, args []string) {
-			client, err := k8sGetClient(kubeconfig)
-			if err != nil {
-				log.Error(fmt.Errorf("failed to get client: %v", err))
+			input := &nodeControllerInput{
+				updateInterval:         updateInterval,
+				waitInterval:           waitInterval,
+				kubeconfig:             kubeconfig,
+				concurrentTerminations: concurrentTerminations,
 			}
-			fmt.Println(client.ServerVersion())
-			// TODO: implement to actually start the informer
+			controller := newNodeController(input)
+
+			stopCh := make(chan struct{})
+			defer close(stopCh)
+
+			controller.Run(stopCh)
+
 		},
 	}
 
-	command.Flags().DurationVar(&updateInterval, "update.interval", 10*time.Second, "time.Duration cache update interval")
+	command.Flags().DurationVar(&updateInterval, "update.interval", 20*time.Second, "time.Duration cache update interval")
+	command.Flags().DurationVar(&waitInterval, "wait.interval", 1*time.Minute, "time.Duration drain wait interval")
+	command.Flags().IntVar(&concurrentTerminations, "concurrent.terminations", 1, "number of concurrent terminations allowed")
 	command.Flags().StringVar(&kubeconfig, "kube.config", "", "path to kube config")
-	command.Flags().StringVar(&nodename, "node.name", "", "name of node")
 	command.MarkFlagRequired("kube.config")
-	command.MarkFlagRequired("node.name")
 
 	return command
 }
