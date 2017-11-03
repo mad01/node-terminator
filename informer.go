@@ -57,11 +57,25 @@ func newNodeController(input *nodeControllerInput) *nodeController {
 		},
 		// The types of objects this informer will return
 		&v1.Node{},
-		updateInterval,
+		input.updateInterval,
 		// Callback Functions to trigger on add/update/delete
 		cache.ResourceEventHandlerFuncs{
-			AddFunc:    func(obj interface{}) {},
-			UpdateFunc: func(old, new interface{}) {},
+			AddFunc: func(obj interface{}) {},
+			UpdateFunc: func(old, new interface{}) {
+				node := new.(*v1.Node)
+				if !c.terminator.activeTerminations.Has(node.GetName()) {
+					if checkAnnotationsExists(node) == nil {
+						if !node.Spec.Unschedulable {
+							event := newTerminatorEvent(node.GetName())
+							event.waitInterval = input.waitInterval
+							c.terminator.events <- *event
+						} else {
+							log.Infof("node set to unschedulable: %v skipping it", node.GetName())
+						}
+					}
+				}
+
+			},
 			DeleteFunc: func(obj interface{}) {},
 		},
 		cache.Indexers{},
