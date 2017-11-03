@@ -22,6 +22,12 @@ func newTerminatorEvent(nodename string) *TerminatorEvent {
 type TerminatorEvent struct {
 	nodename     string
 	waitInterval time.Duration
+	worker       int
+}
+
+// GetWorker returns the go rutine num of the worker
+func (t *TerminatorEvent) GetWorker() string {
+	return fmt.Sprintf("worker %d", t.worker)
 }
 
 func newTerminator(kubeconfig string) *Terminator {
@@ -63,9 +69,12 @@ func (t *Terminator) worker(num int, stopCh chan struct{}) {
 	for {
 		select {
 		case event := <-t.events:
+			event.worker = num
 			err := t.terminate(&event)
 			if err != nil {
-				log.Errorf("failed to terminate node %v %v", event.nodename, err.Error())
+				log.Errorf("%v failed to terminate node %v %v",
+					event.GetWorker(), event.nodename, err.Error(),
+				)
 			}
 		case _ = <-stopCh:
 			log.Infof("stopping worker")
@@ -76,36 +85,51 @@ func (t *Terminator) worker(num int, stopCh chan struct{}) {
 
 func (t *Terminator) terminate(event *TerminatorEvent) error {
 	// set node ot no schedule
-	log.Infof("terminator get event %v", event.nodename)
+	log.Infof("%v terminator get event %v", event.GetWorker(), event.nodename)
 	t.activeTerminations.Add(event.nodename)
 	err := setNodeUnschedulable(event.nodename, t.client)
 	if err != nil {
-		return fmt.Errorf("failed to patch node %v", err.Error())
+		return fmt.Errorf("%v failed to patch node %v", event.GetWorker(), err.Error())
 	}
 
 	// drain node
-	log.Infof("starting drain of node %v", event.nodename)
+	log.Infof("%v starting drain of node %v", event.GetWorker(), event.nodename)
 	err = t.eviction.DrainNode(event.nodename)
 	if err != nil {
-		log.Errorf("failed to drain node %v %v", event.nodename, err.Error())
+		log.Errorf("%v failed to drain node %v %v",
+			event.GetWorker(),
+			event.nodename,
+			err.Error(),
+		)
 	}
 
 	// terninate node
-	// TODO: implement safeguard to never terminate master node only worker
-	log.Infof("starting termination of ec2 instance with node name %v", event.nodename)
+	log.Infof("%v starting termination of ec2 instance with node name %v",
+		event.GetWorker(),
+		event.nodename,
+	)
 	ec2Client := newEC2()
 	err = ec2Client.awsTerminateInstance(event.nodename)
 	if err != nil {
-		return fmt.Errorf("failed to terminate node %v %v", event.nodename, err.Error())
+		return fmt.Errorf("%v failed to terminate node %v %v",
+			event.GetWorker(),
+			event.nodename,
+			err.Error(),
+		)
 	}
 
 	// wait for new node (sleep)
-	log.Infof("waiting for %s node to terminate %v", event.waitInterval, event.nodename)
+	log.Infof("%v waiting for %s node to terminate %v",
+		event.GetWorker(),
+		event.waitInterval,
+		event.nodename,
+	)
 	time.Sleep(event.waitInterval)
 
 	// release and go to next
 	t.activeTerminations.Remove(event.nodename)
-	log.Infof("done terminating node %v", event.nodename)
+	t.doneNodes.Add(event.nodename)
+	log.Infof("%v done terminating node %v", event.GetWorker(), event.nodename)
 
 	return nil
 }
