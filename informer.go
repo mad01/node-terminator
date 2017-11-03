@@ -8,7 +8,6 @@ import (
 	"k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
-	"k8s.io/apimachinery/pkg/util/wait"
 	"k8s.io/apimachinery/pkg/watch"
 	"k8s.io/client-go/kubernetes"
 	lister_v1 "k8s.io/client-go/listers/core/v1"
@@ -24,12 +23,11 @@ type nodeControllerInput struct {
 
 // manages all nodes and sets annotations on N nodes to reboot at one time
 type nodeController struct {
-	client                 *kubernetes.Clientset
-	informer               cache.Controller
-	indexer                cache.Indexer
-	nodeLister             lister_v1.NodeLister
-	terminator             *Terminator
-	concurrentTerminations int
+	client     *kubernetes.Clientset
+	informer   cache.Controller
+	indexer    cache.Indexer
+	nodeLister lister_v1.NodeLister
+	terminator *Terminator
 }
 
 func newNodeController(input *nodeControllerInput) *nodeController {
@@ -39,12 +37,12 @@ func newNodeController(input *nodeControllerInput) *nodeController {
 	}
 
 	c := &nodeController{
-		client:                 client,
-		concurrentTerminations: input.concurrentTerminations,
+		client: client,
 	}
 
 	c.terminator = newTerminator(input.kubeconfig)
 	c.terminator.eviction.waitInterval = input.waitInterval
+	c.terminator.concurrentTerminations = input.concurrentTerminations
 
 	indexer, informer := cache.NewIndexerInformer(
 		&cache.ListWatch{
@@ -63,18 +61,17 @@ func newNodeController(input *nodeControllerInput) *nodeController {
 			AddFunc: func(obj interface{}) {},
 			UpdateFunc: func(old, new interface{}) {
 				node := new.(*v1.Node)
-				if !c.terminator.activeTerminations.Has(node.GetName()) {
-					if checkAnnotationsExists(node) == nil {
-						if !node.Spec.Unschedulable {
-							event := newTerminatorEvent(node.GetName())
-							event.waitInterval = input.waitInterval
-							c.terminator.events <- *event
-						} else {
-							log.Infof("node set to unschedulable: %v skipping it", node.GetName())
+				if !c.terminator.doneNodes.Has(node.GetName()) {
+					if c.terminator.activeTerminations.Size() <= input.concurrentTerminations {
+						if !c.terminator.activeTerminations.Has(node.GetName()) {
+							if checkAnnotationsExists(node) == nil && !checkIfMaster(node) {
+								event := newTerminatorEvent(node.GetName())
+								event.waitInterval = input.waitInterval
+								c.terminator.events <- *event
+							}
 						}
 					}
 				}
-
 			},
 			DeleteFunc: func(obj interface{}) {},
 		},
@@ -92,11 +89,7 @@ func (c *nodeController) Run(stopCh chan struct{}) {
 	log.Info("Starting nodeController")
 
 	go c.informer.Run(stopCh)
-
-	// start up your worker threads based on concurrentTerminations
-	for i := 0; i < c.concurrentTerminations; i++ {
-		go wait.Until(c.terminator.Run, time.Second, stopCh)
-	}
+	go c.terminator.Run(stopCh)
 
 	<-stopCh
 	log.Info("Stopping nodeController")

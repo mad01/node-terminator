@@ -35,20 +35,31 @@ func newTerminator(kubeconfig string) *Terminator {
 		client:             client,
 		eviction:           newEviction(kubeconfig),
 		activeTerminations: set.New(),
+		doneNodes:          set.New(),
 	}
 	return &t
 }
 
 // Terminator handles node terminate events and handles the lifetime of the event
 type Terminator struct {
-	events             chan TerminatorEvent
-	client             *kubernetes.Clientset
-	eviction           *Eviction
-	activeTerminations *set.Set
+	events                 chan TerminatorEvent
+	client                 *kubernetes.Clientset
+	eviction               *Eviction
+	activeTerminations     *set.Set
+	doneNodes              *set.Set
+	concurrentTerminations int
 }
 
 // Run terminator
-func (t *Terminator) Run() {
+func (t *Terminator) Run(stopCh chan struct{}) {
+	// start up your worker threads based on concurrentTerminations
+	for i := 0; i < t.concurrentTerminations; i++ {
+		go t.worker(i, stopCh)
+	}
+
+}
+
+func (t *Terminator) worker(num int, stopCh chan struct{}) {
 	for {
 		select {
 		case event := <-t.events:
@@ -56,6 +67,9 @@ func (t *Terminator) Run() {
 			if err != nil {
 				log.Errorf("failed to terminate node %v %v", event.nodename, err.Error())
 			}
+		case _ = <-stopCh:
+			log.Infof("stopping worker")
+			return
 		}
 	}
 }
