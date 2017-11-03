@@ -14,7 +14,7 @@ import (
 )
 
 // manages all nodes and sets annotations on N nodes to reboot at one time
-type nodeCoordinatorController struct {
+type nodeController struct {
 	client     kubernetes.Clientset
 	informer   cache.Controller
 	indexer    cache.Indexer
@@ -22,13 +22,13 @@ type nodeCoordinatorController struct {
 	terminator *Terminator
 }
 
-func newNodeCoordinatorController(
+func newNodeController(
 	client kubernetes.Clientset,
 	namespace string,
 	updateInterval time.Duration,
-	kubeconfig string) *nodeCoordinatorController {
+	kubeconfig string) *nodeController {
 
-	c := &nodeCoordinatorController{
+	c := &nodeController{
 		client: client,
 	}
 
@@ -62,12 +62,12 @@ func newNodeCoordinatorController(
 	return c
 }
 
-func (c *nodeCoordinatorController) Run(stopCh chan struct{}) {
-	log.Info("Starting nodeCoordinatorController")
+func (c *nodeController) Run(stopCh chan struct{}) {
+	log.Info("Starting nodeController")
 
 	go c.informer.Run(stopCh)
 	go c.terminator.Run(stopCh) //TODO: implement to run N terminators to allow more paralell terminations of nodes
 
 	<-stopCh
-	log.Info("Stopping nodeCoordinatorController")
+	log.Info("Stopping nodeController")
 }

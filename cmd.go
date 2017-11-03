@@ -92,12 +92,12 @@ func cmdPatchNode() *cobra.Command {
 	return command
 }
 
-func cmdCordinator() *cobra.Command {
+func cmdRunTerminator() *cobra.Command {
 	var updateInterval time.Duration
 	var kubeconfig, nodename string
 	var command = &cobra.Command{
-		Use:   "cordinator",
-		Short: "run cordinator",
+		Use:   "terminator",
+		Short: "run terminator",
 		Long:  "",
 		Run: func(cmd *cobra.Command, args []string) {
 			client, err := k8sGetClient(kubeconfig)
@@ -105,7 +105,7 @@ func cmdCordinator() *cobra.Command {
 				log.Error(fmt.Errorf("failed to get client: %v", err))
 			}
 			fmt.Println(client.ServerVersion())
-			// TODO: implement to actually start the cordinator
+			// TODO: implement to actually start the informer
 		},
 	}
 
@@ -132,7 +132,7 @@ func cmdVersion() *cobra.Command {
 
 func runCmd() error {
 	var rootCmd = &cobra.Command{Use: "k8s-node-updater"}
-	rootCmd.AddCommand(cmdCordinator())
+	rootCmd.AddCommand(cmdRunTerminator())
 	rootCmd.AddCommand(cmdVersion())
 	rootCmd.AddCommand(cmdPatchNode())
 	rootCmd.AddCommand(cmdTerminateNode())
