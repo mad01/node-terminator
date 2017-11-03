@@ -37,3 +37,6 @@ docker/push:
 
 docker/login:
 	@docker login -u $(QUAY_LOGIN) -p="$(QUAY_PASSWORD)" quay.io
+
+deps/ensure/vendor/only:
+	@dep ensure -vendor-only
