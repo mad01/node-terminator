@@ -68,6 +68,18 @@
   version = "v3.1.0"
 
 [[projects]]
+  name = "github.com/docker/distribution"
+  packages = ["digest","reference"]
+  revision = "48294d928ced5dd9b378f7fd7c6f5da3ff3f2c89"
+  version = "v2.6.2"
+
+[[projects]]
+  name = "github.com/docker/docker"
+  packages = ["api/types","pkg/term","pkg/term/winconsole"]
+  revision = "fc4825d5ef5e0e1af74904208f9b925c22f0b6f8"
+  version = "v1.6.0-rc5"
+
+[[projects]]
   branch = "master"
   name = "github.com/docker/spdystream"
   packages = [".","spdy"]
@@ -263,12 +275,6 @@
   name = "github.com/mxk/go-flowrate"
   packages = ["flowrate"]
   revision = "cca7078d478f8520f85629ad7c68962d31ed7682"
-
-[[projects]]
-  name = "github.com/opencontainers/go-digest"
-  packages = ["."]
-  revision = "279bed98673dd5bef374d3b6e4b09e2af76183bf"
-  version = "v1.0.0-rc1"
 
 [[projects]]
   name = "github.com/pborman/uuid"
@@ -468,6 +474,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "d1539f5719c7cab615884ff870f5d2d653484b2b55fae304d4d43a951909a308"
+  inputs-digest = "726f6bee58c56dfdde3bd965da1f37ab51725936d32ce00dd2d32f39192c25d6"
   solver-name = "gps-cdcl"
   solver-version = 1
