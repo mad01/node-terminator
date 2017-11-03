@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"time"
 
 	log "github.com/sirupsen/logrus"
@@ -15,7 +16,7 @@ import (
 
 // manages all nodes and sets annotations on N nodes to reboot at one time
 type nodeController struct {
-	client     kubernetes.Clientset
+	client     *kubernetes.Clientset
 	informer   cache.Controller
 	indexer    cache.Indexer
 	nodeLister lister_v1.NodeLister
@@ -23,16 +24,20 @@ type nodeController struct {
 }
 
 func newNodeController(
-	client kubernetes.Clientset,
 	namespace string,
 	updateInterval time.Duration,
 	kubeconfig string) *nodeController {
+
+	client, err := k8sGetClient(kubeconfig)
+	if err != nil {
+		panic(fmt.Sprintf("failed to get client: %v", err.Error()))
+	}
 
 	c := &nodeController{
 		client: client,
 	}
 
-	c.terminator = newTerminator(&client, kubeconfig)
+	c.terminator = newTerminator(kubeconfig)
 
 	indexer, informer := cache.NewIndexerInformer(
 		&cache.ListWatch{
