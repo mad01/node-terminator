@@ -14,29 +14,36 @@ import (
 	"k8s.io/client-go/tools/cache"
 )
 
-// manages all nodes and sets annotations on N nodes to reboot at one time
-type nodeController struct {
-	client     *kubernetes.Clientset
-	informer   cache.Controller
-	indexer    cache.Indexer
-	nodeLister lister_v1.NodeLister
-	terminator *Terminator
+type nodeControllerInput struct {
+	waitInterval           time.Duration // TODO: need better name
+	updateInterval         time.Duration
+	kubeconfig             string
+	concurrentTerminations int
 }
 
-func newNodeController(
-	updateInterval time.Duration,
-	kubeconfig string) *nodeController {
+// manages all nodes and sets annotations on N nodes to reboot at one time
+type nodeController struct {
+	client                 *kubernetes.Clientset
+	informer               cache.Controller
+	indexer                cache.Indexer
+	nodeLister             lister_v1.NodeLister
+	terminator             *Terminator
+	concurrentTerminations int
+}
 
-	client, err := k8sGetClient(kubeconfig)
+func newNodeController(input *nodeControllerInput) *nodeController {
+	client, err := k8sGetClient(input.kubeconfig)
 	if err != nil {
 		panic(fmt.Sprintf("failed to get client: %v", err.Error()))
 	}
 
 	c := &nodeController{
-		client: client,
+		client:                 client,
+		concurrentTerminations: input.concurrentTerminations,
 	}
 
-	c.terminator = newTerminator(kubeconfig)
+	c.terminator = newTerminator(input.kubeconfig)
+	c.terminator.eviction.waitInterval = input.waitInterval
 
 	indexer, informer := cache.NewIndexerInformer(
 		&cache.ListWatch{
