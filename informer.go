@@ -24,7 +24,6 @@ type nodeController struct {
 }
 
 func newNodeController(
-	namespace string,
 	updateInterval time.Duration,
 	kubeconfig string) *nodeController {
 
@@ -71,7 +70,7 @@ func (c *nodeController) Run(stopCh chan struct{}) {
 	log.Info("Starting nodeController")
 
 	go c.informer.Run(stopCh)
-	go c.terminator.Run(stopCh) //TODO: implement to run N terminators to allow more paralell terminations of nodes
+	go c.terminator.Run(stopCh)
 
 	<-stopCh
 	log.Info("Stopping nodeController")
