@@ -2,7 +2,7 @@ PROJ=k8s-node-terminator
 ORG_PATH=github.com/mad01
 REPO_PATH=$(ORG_PATH)/$(PROJ)
 
-VERSION ?= $(shell ./scripts/git-version)
+VERSION ?= $(shell ./hacks/git-version)
 LD_FLAGS="-X main.Version=$(VERSION)  -extldflags \"-static\" "
 version.Version=$(VERSION)
 $( shell mkdir -p _bin )
