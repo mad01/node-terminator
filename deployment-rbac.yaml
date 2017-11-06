@@ -20,7 +20,7 @@ spec:
       serviceAccount: node-terminator
       containers:
         - name: terminator
-          image: quay.io/mad01/k8s-node-terminator:ee8bea58-dirty
+          image: quay.io/mad01/k8s-node-terminator:fe108038
           command:
             - "./k8s-node-terminator"
           args:
