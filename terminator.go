@@ -89,6 +89,7 @@ func (t *Terminator) terminate(event *TerminatorEvent) error {
 	t.activeTerminations.Add(event.nodename)
 	err := setNodeUnschedulable(event.nodename, t.client)
 	if err != nil {
+		t.activeTerminations.Remove(event.nodename)
 		return fmt.Errorf("%v failed to patch node %v", event.GetWorker(), err.Error())
 	}
 
@@ -96,6 +97,7 @@ func (t *Terminator) terminate(event *TerminatorEvent) error {
 	log.Infof("%v starting drain of node %v", event.GetWorker(), event.nodename)
 	err = t.eviction.DrainNode(event.nodename)
 	if err != nil {
+		t.activeTerminations.Remove(event.nodename)
 		log.Errorf("%v failed to drain node %v %v",
 			event.GetWorker(),
 			event.nodename,
@@ -111,6 +113,7 @@ func (t *Terminator) terminate(event *TerminatorEvent) error {
 	ec2Client := newEC2()
 	err = ec2Client.awsTerminateInstance(event.nodename)
 	if err != nil {
+		t.activeTerminations.Remove(event.nodename)
 		return fmt.Errorf("%v failed to terminate node %v %v",
 			event.GetWorker(),
 			event.nodename,
