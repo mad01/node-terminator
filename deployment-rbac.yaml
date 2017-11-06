@@ -20,7 +20,7 @@ spec:
       serviceAccount: node-terminator
       containers:
         - name: terminator
-          image: quay.io/mad01/k8s-node-terminator:2393f702
+          image: quay.io/mad01/k8s-node-terminator:ee8bea58-dirty
           command:
             - "./k8s-node-terminator"
           args:
@@ -51,6 +51,30 @@ rules:
   - apiGroups: [""]
     resources: ["nodes"]
     verbs: ["get", "watch", "list", "update", "patch"]
+
+  - apiGroups: [""]
+    resources: ["replicasets", "daemonsets", "deployments", "statefulsets"]
+    verbs: ["get", "list", "update", "patch", "delete"]
+
+  - apiGroups: [""]
+    resources: ["pods"]
+    verbs: ["get", "list", "delete"]
+
+  - apiGroups: ["extensions"]
+    resources: ["replicasets", "daemonsets", "deployments", "statefulsets"]
+    verbs: ["get"]
+
+  - apiGroups: ["apps"]
+    resources: ["statefulsets"]
+    verbs: ["get"]
+
+  - apiGroups: [""]
+    resources: ["pods/eviction"]
+    verbs: ["create", "get", "list"]
+
+  - apiGroups: [""]
+    resources: ["events"]
+    verbs: ["watch", "list"]
 
 ---
 apiVersion: rbac.authorization.k8s.io/v1beta1
