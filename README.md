@@ -1,8 +1,11 @@
 # k8s-node-terminator
 
+a service to manage the upgrade lifecyckle of k8s nodes 
+
+the terminator looks for a annotation on the nodes. The terminator then based on the allowed concurrent terminations and wait inbetween terminations it will terminate N nodes at one time and track the progress of the nodes until all the nodes in a cluster have been terminated that have that annotation. 
+
 the assumption for this to work is that you are using something like `kops` that have a remote state that is newer then the current state of the nodes in the cluster. for example the k8s version is `1.7.4` and you like to update all nodes to `1.7.9`. and you have updated the remote state that kops nodeup uses this would allow a cluster update of the worker nodes by a service running in the cluster
 
-A service to manage the upgrade lifecyckle of k8s nodes. The terminator looks for a annotation on the nodes. The terminator then based on the allowed concurrent terminations and wait inbetween terminations it will terminate N nodes at one time and track the progress of the nodes until all the nodes in a cluster have been terminated that have that annotation. 
 
 the terminator does the following
 * looks if node exists in done nodes
