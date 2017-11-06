@@ -28,7 +28,19 @@ spec:
             - "--concurrent.terminations=2"
             - "--update.interval=1m"
             - "--wait.interval=3m"
-
+          env:
+            - name: AWS_REGION
+              value: "eu-west-1"
+            - name: AWS_ACCESS_KEY_ID
+              valueFrom:
+                secretKeyRef:
+                  name: aws-secret
+                  key: access_key
+            - name: AWS_SECRET_ACCESS_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: aws-secret
+                  key: secret_access_key
 ---
 apiVersion: rbac.authorization.k8s.io/v1beta1
 kind: ClusterRole
