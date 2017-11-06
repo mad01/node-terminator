@@ -22,6 +22,10 @@ the terminator does the following
 * adds node to done nodes/removed from in progress
 * done > looks for next termination event
 
+## outside scope of service 
+
+it's outside of the scope of this service to set the annotations on the nodes. The idea is that this will be managed by a external service or by using kubectl. a external service could set the annotations on nodes that does not match the desired state. You could for example only have nodes annotated during a time window i.e a maintenance window and only have nodes terminate slowly in that window
+
 ## annotation
 `k8s.node.terminator.reboot` set to `true` as string in the nodes annotations
 ```yaml
@@ -38,7 +42,4 @@ add annotation to node for termination
 kubectl annotate node ip-172-20-118-57.eu-west-1.compute.internal k8s.node.terminator.reboot="true"
 ```
 
-## outside scope of service 
-
-it's outside of the scope of this service to set the annotations on the nodes. The idea is that this will be managed by a external service or by using kubectl. a external service could set the annotations on nodes that does not match the desired state. You could for example only have nodes annotated during a time window i.e a maintenance window and only have nodes terminate slowly in that window
 
