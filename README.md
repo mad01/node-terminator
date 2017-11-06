@@ -1,7 +1,7 @@
 # k8s-node-terminator
 [![Docker Repository on Quay](https://quay.io/repository/mad01/k8s-node-terminator/status "Docker Repository on Quay")](https://quay.io/repository/mad01/k8s-node-terminator)
 
-a service to manage the upgrade lifecyckle of k8s nodes 
+a service to manage the upgrade lifecyckle of k8s nodes (supports aws)
 
 the terminator looks for a annotation on the nodes. The terminator then based on the allowed concurrent terminations and wait inbetween terminations it will terminate N nodes at one time and track the progress of the nodes until all the nodes in a cluster have been terminated that have that annotation. 
 
