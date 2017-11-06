@@ -1,0 +1,62 @@
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: terminator
+
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  namespace: terminator
+  name: node-terminator
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: node-terminator
+    spec:
+      serviceAccount: node-terminator
+      containers:
+        - name: terminator
+          image: quay.io/mad01/k8s-node-terminator:2393f702
+          command:
+            - "./k8s-node-terminator"
+          args:
+            - "terminator"
+            - "--concurrent.terminations=2"
+            - "--update.interval=1m"
+            - "--wait.interval=3m"
+
+---
+apiVersion: rbac.authorization.k8s.io/v1beta1
+kind: ClusterRole
+metadata:
+  name: node-terminator
+  namespace: terminator
+rules:
+  - apiGroups: [""]
+    resources: ["nodes"]
+    verbs: ["get", "watch", "list"]
+
+---
+apiVersion: rbac.authorization.k8s.io/v1beta1
+kind: ClusterRoleBinding
+metadata:
+  name: node-terminator
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: node-terminator
+subjects:
+  - kind: ServiceAccount
+    name: node-terminator
+    namespace: terminator
+
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  namespace: terminator
+  name: node-terminator
