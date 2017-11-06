@@ -121,7 +121,6 @@ func cmdRunTerminator() *cobra.Command {
 	command.Flags().DurationVar(&waitInterval, "wait.interval", 1*time.Minute, "time.Duration drain wait interval")
 	command.Flags().IntVar(&concurrentTerminations, "concurrent.terminations", 1, "number of concurrent terminations allowed")
 	command.Flags().StringVar(&kubeconfig, "kube.config", "", "path to kube config")
-	command.MarkFlagRequired("kube.config")
 
 	return command
 }
