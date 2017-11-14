@@ -12,6 +12,9 @@ import (
 	"k8s.io/client-go/kubernetes"
 	lister_v1 "k8s.io/client-go/listers/core/v1"
 	"k8s.io/client-go/tools/cache"
+
+	"github.com/mad01/k8s-node-terminator/pkg/annotations"
+	"github.com/mad01/k8s-node-terminator/pkg/window"
 )
 
 type nodeControllerInput struct {
@@ -64,10 +67,19 @@ func newNodeController(input *nodeControllerInput) *nodeController {
 				if !c.terminator.doneNodes.Has(node.GetName()) {
 					if c.terminator.activeTerminations.Size() <= input.concurrentTerminations {
 						if !c.terminator.activeTerminations.Has(node.GetName()) {
-							if checkAnnotationsExists(node) == nil && !checkIfMaster(node) {
-								event := newTerminatorEvent(node.GetName())
-								event.waitInterval = input.waitInterval
-								c.terminator.events <- *event
+							if annotations.CheckAnnotationsExists(node) == nil && !checkIfMaster(node) {
+								maintainWindow, err := window.GetMaintenanceWindowFromAnnotations(node)
+								if err != nil {
+									if maintainWindow.InMaintenanceWindow() == true {
+										event := newTerminatorEvent(node.GetName())
+										event.waitInterval = input.waitInterval
+										c.terminator.events <- *event
+									}
+								} else {
+									event := newTerminatorEvent(node.GetName())
+									event.waitInterval = input.waitInterval
+									c.terminator.events <- *event
+								}
 							}
 						}
 					}
