@@ -31,7 +31,7 @@ it's outside of the scope of this service to set the annotations on the nodes. T
 `k8s.node.terminator.reboot` set to `true` as string in the nodes annotations
 `k8s.node.terminator.fromTimeWindow` both from/to is set terminations will be done in that window in format `hh:mm AM/PM`
 `k8s.node.terminator.toTimeWindow` both from/to is set terminations will be done in that window in format `hh:mm AM/PM`
-the termination window will mean that termination will be allowed every day in the window
+the termination window will mean that termination will be allowed every day in the window. The time is take with `time.Now()` and should base the timezone on local time
 
 ```yaml
 apiVersion: v1
