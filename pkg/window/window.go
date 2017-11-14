@@ -114,6 +114,16 @@ type MaintenanceWindow struct {
 	to   *time.Time
 }
 
+// From returns from window time
+func (m *MaintenanceWindow) From() *time.Time {
+	return m.from
+}
+
+// To returns to window time
+func (m *MaintenanceWindow) To() *time.Time {
+	return m.to
+}
+
 // InMaintenanceWindow info
 func (m *MaintenanceWindow) InMaintenanceWindow() bool {
 	currentTimeUnix := time.Now().Unix()
