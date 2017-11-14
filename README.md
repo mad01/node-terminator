@@ -29,12 +29,19 @@ it's outside of the scope of this service to set the annotations on the nodes. T
 
 ## annotation
 `k8s.node.terminator.reboot` set to `true` as string in the nodes annotations
+`k8s.node.terminator.fromTimeWindow` both from/to is set terminations will be done in that window in format `hh:mm AM/PM`
+`k8s.node.terminator.toTimeWindow` both from/to is set terminations will be done in that window in format `hh:mm AM/PM`
+the termination window will mean that termination will be allowed every day in the window
+
 ```yaml
 apiVersion: v1
 kind: Node
 metadata:
   annotations:
     k8s.node.terminator.reboot: "true"
+    k8s.node.terminator.fromTimeWindow: "02:01 AM"
+    k8s.node.terminator.toTimeWindow: "05:01 AM"
+
 ```
 
 ## testing 
