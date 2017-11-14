@@ -101,8 +101,10 @@ func NewMaintenanceWindow(from, to string) (*MaintenanceWindow, error) {
 	}
 
 	m := MaintenanceWindow{
-		from: start,
-		to:   stop,
+		fromString: from,
+		toString:   to,
+		from:       start,
+		to:         stop,
 	}
 	return &m, nil
 
@@ -110,8 +112,20 @@ func NewMaintenanceWindow(from, to string) (*MaintenanceWindow, error) {
 
 // MaintenanceWindow info
 type MaintenanceWindow struct {
-	from *time.Time
-	to   *time.Time
+	fromString string
+	toString   string
+	from       *time.Time
+	to         *time.Time
+}
+
+// FromString returns the input string hh:mm AM/PM
+func (m *MaintenanceWindow) FromString() string {
+	return m.fromString
+}
+
+// ToString returns the input string hh:mm AM/PM
+func (m *MaintenanceWindow) ToString() string {
+	return m.toString
 }
 
 // From returns from window time
