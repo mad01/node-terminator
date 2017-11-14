@@ -1,4 +1,4 @@
-package main
+package annotations
 
 import (
 	"testing"
@@ -20,7 +20,7 @@ func TestCheckAnnotationsExists(t *testing.T) {
 				ObjectMeta: metav1.ObjectMeta{
 					Name: "node0",
 					Annotations: map[string]string{
-						nodeAnnotation: "true",
+						NodeAnnotationReboot: "true",
 					},
 				},
 				Spec: v1.NodeSpec{
@@ -36,7 +36,7 @@ func TestCheckAnnotationsExists(t *testing.T) {
 				ObjectMeta: metav1.ObjectMeta{
 					Name: "node0",
 					Annotations: map[string]string{
-						nodeAnnotation: "false",
+						NodeAnnotationReboot: "false",
 					},
 				},
 				Spec: v1.NodeSpec{
@@ -61,6 +61,6 @@ func TestCheckAnnotationsExists(t *testing.T) {
 	}
 
 	for _, tc := range testCases {
-		assert.Equal(t, tc.expected, checkAnnotationsExists(tc.node))
+		assert.Equal(t, tc.expected, CheckAnnotationsExists(tc.node))
 	}
 }
