@@ -75,7 +75,7 @@ func newNodeController(input *nodeControllerInput) *nodeController {
 											node.GetName(),
 											maintainWindow.From(),
 											maintainWindow.To(),
-											time.Now()
+											time.Now(),
 										)
 										event := newTerminatorEvent(node.GetName())
 										event.waitInterval = input.waitInterval
