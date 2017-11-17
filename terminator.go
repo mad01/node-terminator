@@ -85,17 +85,12 @@ func (t *Terminator) worker(num int, stopCh chan struct{}) {
 
 func (t *Terminator) terminate(event *TerminatorEvent) error {
 	// set node ot no schedule
-	log.Infof("%v terminator get event %v", event.GetWorker(), event.nodename)
+	log.Infof("%v terminator got event %v", event.GetWorker(), event.nodename)
 	t.activeTerminations.Add(event.nodename)
-	err := setNodeUnschedulable(event.nodename, t.client)
-	if err != nil {
-		t.activeTerminations.Remove(event.nodename)
-		return fmt.Errorf("%v failed to patch node %v", event.GetWorker(), err.Error())
-	}
 
 	// drain node
 	log.Infof("%v starting drain of node %v", event.GetWorker(), event.nodename)
-	err = t.eviction.DrainNode(event.nodename)
+	err := t.eviction.DrainNode(event.nodename)
 	if err != nil {
 		t.activeTerminations.Remove(event.nodename)
 		log.Errorf("%v failed to drain node %v %v",

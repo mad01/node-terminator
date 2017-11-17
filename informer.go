@@ -71,7 +71,12 @@ func newNodeController(input *nodeControllerInput) *nodeController {
 								maintainWindow, _ := window.GetMaintenanceWindowFromAnnotations(node)
 								if maintainWindow != nil {
 									if maintainWindow.InMaintenanceWindow() == true {
-										log.Infof("in maintainWindow starting with node %v window %v - %v :: current time %v", node.GetName(), maintainWindow.From(), maintainWindow.To(), time.Now())
+										log.Infof("in maintainWindow starting with node %v window %v - %v :: current time %v",
+											node.GetName(),
+											maintainWindow.From(),
+											maintainWindow.To(),
+											time.Now()
+										)
 										event := newTerminatorEvent(node.GetName())
 										event.waitInterval = input.waitInterval
 										c.terminator.events <- *event
