@@ -1,4 +1,4 @@
-PROJ=k8s-node-terminator
+PROJ=node-terminator
 ORG_PATH=github.com/mad01
 REPO_PATH=$(ORG_PATH)/$(PROJ)
 

@@ -1,5 +1,5 @@
-# k8s-node-terminator
-[![Docker Repository on Quay](https://quay.io/repository/mad01/k8s-node-terminator/status "Docker Repository on Quay")](https://quay.io/repository/mad01/k8s-node-terminator)
+# node-terminator
+[![Docker Repository on Quay](https://quay.io/repository/mad01/node-terminator/status "Docker Repository on Quay")](https://quay.io/repository/mad01/node-terminator)
 
 a service to manage the upgrade lifecyckle of k8s nodes (supports aws)
 

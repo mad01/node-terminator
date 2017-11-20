@@ -13,8 +13,8 @@ import (
 	lister_v1 "k8s.io/client-go/listers/core/v1"
 	"k8s.io/client-go/tools/cache"
 
-	"github.com/mad01/k8s-node-terminator/pkg/annotations"
-	"github.com/mad01/k8s-node-terminator/pkg/window"
+	"github.com/mad01/node-terminator/pkg/annotations"
+	"github.com/mad01/node-terminator/pkg/window"
 )
 
 type nodeControllerInput struct {

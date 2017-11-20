@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/mad01/k8s-node-terminator/pkg/annotations"
+	"github.com/mad01/node-terminator/pkg/annotations"
 	"k8s.io/api/core/v1"
 )
 

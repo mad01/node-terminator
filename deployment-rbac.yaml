@@ -14,9 +14,9 @@ spec:
       serviceAccount: node-terminator
       containers:
         - name: terminator
-          image: quay.io/mad01/k8s-node-terminator:4410214b
+          image: quay.io/mad01/node-terminator:4410214b
           command:
-            - "./k8s-node-terminator"
+            - "./node-terminator"
           args:
             - "terminator"
             - "--concurrent.terminations=2"

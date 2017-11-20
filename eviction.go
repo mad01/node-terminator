@@ -5,7 +5,7 @@ import (
 	"os"
 	"time"
 
-	"github.com/mad01/k8s-node-terminator/pkg/kutil"
+	"github.com/mad01/node-terminator/pkg/kutil"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
 	log "github.com/sirupsen/logrus"
