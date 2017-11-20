@@ -3,7 +3,7 @@ ORG_PATH=github.com/mad01
 REPO_PATH=$(ORG_PATH)/$(PROJ)
 
 VERSION ?= $(shell ./hacks/git-version)
-LD_FLAGS="-X main.Version=$(VERSION)  -extldflags \"-static\" "
+LD_FLAGS="-X main.Version=$(VERSION)"
 version.Version=$(VERSION)
 $( shell mkdir -p _bin )
 $( shell mkdir -p _release )
