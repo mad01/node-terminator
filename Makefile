@@ -3,7 +3,7 @@ ORG_PATH=github.com/mad01
 REPO_PATH=$(ORG_PATH)/$(PROJ)
 
 VERSION ?= $(shell ./hacks/git-version)
-LD_FLAGS="-X main.Version=$(VERSION)"
+LD_FLAGS="-X main.Version=$(VERSION) -w "
 version.Version=$(VERSION)
 $( shell mkdir -p _bin )
 $( shell mkdir -p _release )
@@ -26,7 +26,7 @@ build/dev:
 	@go install -v -ldflags $(LD_FLAGS) 
 
 build/release:
-	@go build -v -o _release/$(PROJ) -ldflags $(LD_FLAGS) 
+	@go build -v -o _release/$(PROJ) -ldflags $(LD_FLAGS)  
 
 
 docker/build:
