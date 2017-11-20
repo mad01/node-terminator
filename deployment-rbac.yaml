@@ -14,7 +14,7 @@ spec:
       serviceAccount: node-terminator
       containers:
         - name: terminator
-          image: quay.io/mad01/node-terminator:4410214b
+          image: quay.io/mad01/node-terminator:893bd926
           command:
             - "./node-terminator"
           args:
