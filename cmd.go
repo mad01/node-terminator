@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"os"
 	"time"
 
 	log "github.com/sirupsen/logrus"
@@ -137,13 +138,42 @@ func cmdVersion() *cobra.Command {
 	return command
 }
 
+func cmdCompletionBASH(rootGroup *cobra.Command) *cobra.Command {
+	var command = &cobra.Command{
+		Use:   "bash",
+		Short: "get bash completion",
+		Long:  "source <(node-terminator completion bash)",
+		Run: func(cmd *cobra.Command, args []string) {
+			rootGroup.GenBashCompletion(os.Stdout)
+		},
+	}
+	return command
+}
+
+func cmdCompletionZSH(rootGroup *cobra.Command) *cobra.Command {
+	var command = &cobra.Command{
+		Use:   "zsh",
+		Short: "get bash completion",
+		Long:  "source <(node-terminator completion zsh)",
+		Run: func(cmd *cobra.Command, args []string) {
+			rootGroup.GenZshCompletion(os.Stdout)
+		},
+	}
+	return command
+}
+
 func runCmd() error {
-	var rootCmd = &cobra.Command{Use: "k8s-node-updater"}
+	var rootCmd = &cobra.Command{Use: "node-terminator"}
 	rootCmd.AddCommand(cmdRunTerminator())
 	rootCmd.AddCommand(cmdVersion())
 	rootCmd.AddCommand(cmdPatchNode())
 	rootCmd.AddCommand(cmdTerminateNode())
 	rootCmd.AddCommand(cmdDrainNode())
+
+	var completionCmdSubGroup = &cobra.Command{Use: "completion"}
+	completionCmdSubGroup.AddCommand(cmdCompletionZSH(rootCmd))
+	completionCmdSubGroup.AddCommand(cmdCompletionBASH(rootCmd))
+	rootCmd.AddCommand(completionCmdSubGroup)
 
 	err := rootCmd.Execute()
 	if err != nil {
