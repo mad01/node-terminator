@@ -1,6 +1,7 @@
 package main
 
 import (
+	"errors"
 	"fmt"
 	"time"
 
@@ -15,6 +16,14 @@ import (
 
 	"github.com/mad01/node-terminator/pkg/annotations"
 	"github.com/mad01/node-terminator/pkg/window"
+)
+
+var (
+	errorNodeInDone                     = errors.New("node is in doneNodes")
+	errorActiveTerminationsLimitReached = errors.New("activeTerminations limit reached")
+	errorActiveTerminationsHasNode      = errors.New("activeTerminations has node")
+	errorNodeAnnoationsMissing          = errors.New("missing annotations")
+	errorNodeMaster                     = errors.New("node is master only supporting node type node")
 )
 
 type nodeControllerInput struct {
@@ -64,33 +73,7 @@ func newNodeController(input *nodeControllerInput) *nodeController {
 			AddFunc: func(obj interface{}) {},
 			UpdateFunc: func(old, new interface{}) {
 				node := new.(*v1.Node)
-				if !c.terminator.doneNodes.Has(node.GetName()) {
-					if c.terminator.activeTerminations.Size() <= input.concurrentTerminations {
-						if !c.terminator.activeTerminations.Has(node.GetName()) {
-							if annotations.CheckAnnotationsExists(node) == nil && !checkIfMaster(node) {
-								maintainWindow, _ := window.GetMaintenanceWindowFromAnnotations(node)
-								if maintainWindow != nil {
-									if maintainWindow.InMaintenanceWindow() == true {
-										log.Infof("in maintainWindow starting with node %v window %v - %v :: current time %v",
-											node.GetName(),
-											maintainWindow.From(),
-											maintainWindow.To(),
-											time.Now(),
-										)
-										event := newTerminatorEvent(node.GetName())
-										event.waitInterval = input.waitInterval
-										c.terminator.events <- *event
-									}
-								} else if maintainWindow == nil {
-									log.Infof("maintainWindow not set starting termination of node %v", node.GetName())
-									event := newTerminatorEvent(node.GetName())
-									event.waitInterval = input.waitInterval
-									c.terminator.events <- *event
-								}
-							}
-						}
-					}
-				}
+				_ = c.createNodeEvent(node, input)
 			},
 			DeleteFunc: func(obj interface{}) {},
 		},
@@ -112,4 +95,55 @@ func (c *nodeController) Run(stopCh chan struct{}) {
 
 	<-stopCh
 	log.Info("Stopping nodeController")
+}
+
+func (c *nodeController) createNodeEvent(node *v1.Node, input *nodeControllerInput) error {
+	if !c.terminator.doneNodes.Has(node.GetName()) {
+	} else {
+		return errorNodeInDone
+	}
+
+	if c.terminator.activeTerminations.Size() <= input.concurrentTerminations {
+	} else {
+		return errorActiveTerminationsLimitReached
+	}
+
+	if !c.terminator.activeTerminations.Has(node.GetName()) {
+	} else {
+		return errorActiveTerminationsHasNode
+	}
+
+	if annotations.CheckAnnotationsExists(node) == nil {
+	} else {
+		return errorNodeAnnoationsMissing
+	}
+
+	if !checkIfMaster(node) {
+	} else {
+		return errorNodeMaster
+	}
+
+	maintainWindow, _ := window.GetMaintenanceWindowFromAnnotations(node)
+	if maintainWindow != nil {
+		if maintainWindow.InMaintenanceWindow() == true {
+			log.Infof("in maintainWindow starting with node %v window %v - %v :: current time %v",
+				node.GetName(),
+				maintainWindow.From(),
+				maintainWindow.To(),
+				time.Now(),
+			)
+			event := newTerminatorEvent(node.GetName())
+			event.waitInterval = input.waitInterval
+			c.terminator.events <- *event
+			return nil
+		}
+	} else if maintainWindow == nil {
+		log.Infof("maintainWindow not set starting termination of node %v", node.GetName())
+		event := newTerminatorEvent(node.GetName())
+		event.waitInterval = input.waitInterval
+		c.terminator.events <- *event
+		return nil
+	}
+
+	return fmt.Errorf("this should not have returned")
 }
